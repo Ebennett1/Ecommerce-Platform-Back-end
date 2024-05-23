@@ -1,13 +1,27 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import HttpResponse
 from rest_framework import generics
 from .models import Category, Product, Cart, CartItem, Order, OrderItem
-from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import UserSerializer, RegisterSerializer, CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer
 
 # Create your views here.
 def home(request):
     return HttpResponse("Welcome to the home page!")
 
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
