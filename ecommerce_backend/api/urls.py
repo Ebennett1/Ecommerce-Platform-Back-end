@@ -22,4 +22,5 @@ urlpatterns = [
 
 
 # Next steps: Ensure the database is populated with initial data (products, categories, etc.).
+# Using Unsplash API for product images
 # Confirm that i can fetch this data through the API endpoints.
