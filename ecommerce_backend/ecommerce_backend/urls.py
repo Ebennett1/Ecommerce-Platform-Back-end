@@ -23,3 +23,4 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('', home),
 ]
+
