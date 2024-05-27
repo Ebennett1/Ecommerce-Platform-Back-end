@@ -30,10 +30,19 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CartItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(write_only=True)
+    quantity = serializers.IntegerField(write_only=True)
     product = ProductSerializer(read_only=True)
+
     class Meta:
         model = CartItem
-        fields = '__all__'
+        fields = ['id', 'cart', 'product', 'product_id', 'quantity', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        product_id = validated_data.pop('product_id')
+        product = Product.objects.get(id=product_id)
+        cart_item = CartItem.objects.create(product=product, **validated_data)
+        return cart_item
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
