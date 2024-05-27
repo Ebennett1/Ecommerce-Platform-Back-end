@@ -3,22 +3,37 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
 from rest_framework import generics, status
 from .models import Category, Product, Cart, CartItem, Order, OrderItem
-from .serializers import UserSerializer, RegisterSerializer, CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import UserSerializer, RegisterSerializer, CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer, MyTokenObtainPairSerializer
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
+# Custom Token Obtain Pair View
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        logger.debug(f"Login attempt with data: {request.data}")
+        response = super().post(request, *args, **kwargs)
+        logger.debug(f"Response data: {response.data}")
+        return response
+
+# Home View
 def home(request):
     return HttpResponse("Welcome to the home page!")
 
+# User Registration View
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
+# User Detail View
 class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -26,10 +41,12 @@ class UserDetailView(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+# Category Views
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+# Product Views
 class ProductList(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -38,6 +55,7 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+# Cart Views
 class CartDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartSerializer
@@ -84,12 +102,19 @@ class UpdateCartItem(generics.RetrieveUpdateDestroyAPIView):
         if quantity is not None and int(quantity) < 0:
             return Response({"detail": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        logger.debug(f"Updating cart item {instance.id} with quantity {quantity}")
+        data = {'quantity': quantity}
 
-        return Response(serializer.data)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            logger.debug(f"Updated cart item: {serializer.data}")
+            return Response(serializer.data)
+        else:
+            logger.error(f"Failed to update cart item: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Order Views
 class OrderList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
