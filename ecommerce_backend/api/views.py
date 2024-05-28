@@ -94,7 +94,7 @@ class UpdateCartItem(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop('partial', True)
         instance = self.get_object()
 
         # Validate that quantity is not negative
