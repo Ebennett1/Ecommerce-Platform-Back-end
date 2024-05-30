@@ -71,6 +71,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    total_price = serializers.DecimalField(required=False, max_digits=10, decimal_places=2)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Order
         fields = '__all__'

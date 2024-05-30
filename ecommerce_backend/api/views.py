@@ -127,4 +127,15 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
 class OrderCreate(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        logger.debug(f"Order creation request data: {request.data}")
+        serializer = self.get_serializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            logger.debug(f"Order created successfully: {serializer.data}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            logger.error(f"Order creation failed: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
