@@ -65,7 +65,6 @@ class CartSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
     class Meta:
         model = OrderItem
         fields = '__all__'
@@ -75,3 +74,27 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        order = Order.objects.create(user=user, total_price=0)  # Initial total_price, will update later
+
+        cart_items = CartItem.objects.filter(cart__user=user)
+        total_price = 0
+
+        for item in cart_items:
+            order_item = OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
+            total_price += item.product.price * item.quantity
+
+        order.total_price = total_price
+        order.save()
+
+        # Clear the cart
+        cart_items.delete()
+
+        return order
