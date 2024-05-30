@@ -116,15 +116,6 @@ class UpdateCartItem(generics.RetrieveUpdateDestroyAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Order Views
-class OrderList(generics.ListCreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-
 class OrderCreate(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
