@@ -13,7 +13,7 @@ django.setup()
 from api.models import Product  # Import your Product model
 
 # Your Unsplash API Access Key
-access_key = 'W6QdnPQaUc4sWRhhdos4jN6ZOwAHfHeCsROn4xrB0jQ'
+access_key = 'UNSPLASH_SECRET_KEY'
 
 # Base URL for the Unsplash API
 base_url = 'https://api.unsplash.com'

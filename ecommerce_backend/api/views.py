@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
+import stripe
+from django.conf import settings
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,6 +16,8 @@ from .serializers import UserSerializer, RegisterSerializer, CategorySerializer,
 import logging
 
 logger = logging.getLogger(__name__)
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Custom Token Obtain Pair View
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -152,3 +157,16 @@ class ClearOrderHistoryView(APIView):
         return Response({"message": "Order history cleared."}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+@api_view(['POST'])
+def create_payment_intent(request):
+    try:
+        total_price = request.data['total_price']
+        intent = stripe.PaymentIntent.create(
+            amount=int(total_price * 100),  # amount in cents
+            currency='usd',
+            metadata={'integration_check': 'accept_a_payment'},
+        )
+        return Response({'clientSecret': intent['client_secret']})
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
