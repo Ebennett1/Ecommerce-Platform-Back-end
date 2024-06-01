@@ -94,6 +94,16 @@ DATABASES = {
     }
 }
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Set the access token lifespan
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Set the refresh token lifespan
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',

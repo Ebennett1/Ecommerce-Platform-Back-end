@@ -40,9 +40,9 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 # User Detail View
-class UserDetailView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
+class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
