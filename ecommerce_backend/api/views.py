@@ -57,11 +57,18 @@ class ProductList(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.all()  # Ensure queryset is always assigned
+        queryset = Product.objects.all()
         category_id = self.request.query_params.get('category_id')
+        search_query = self.request.query_params.get('search')
+        
         if category_id is not None:
             queryset = queryset.filter(category_id=category_id)
+        
+        if search_query is not None:
+            queryset = queryset.filter(name__icontains=search_query)
+        
         return queryset
+
 
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
