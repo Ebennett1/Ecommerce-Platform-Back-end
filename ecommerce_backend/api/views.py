@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 import stripe
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -168,6 +168,24 @@ class ClearOrderHistoryView(APIView):
         orders = Order.objects.filter(user=user)
         orders.delete()
         return Response({"message": "Order history cleared."}, status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reorder(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        for item in order.items.all():
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, product=item.product)
+            if not created:
+                cart_item.quantity += item.quantity
+                cart_item.save()
+        return Response({"message": "Items added to cart"}, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
