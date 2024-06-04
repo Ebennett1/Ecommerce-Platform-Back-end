@@ -3,7 +3,9 @@ import sys
 import django
 import requests
 import random
+from django.conf import settings
 
+# Append the project directory to the system path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Setup Django environment
@@ -12,8 +14,12 @@ django.setup()
 
 from api.models import Product  # Import your Product model
 
-# Your Unsplash API Access Key
-access_key = 'UNSPLASH_SECRET_KEY'
+# Access Unsplash API Access Key from Django settings
+access_key = settings.UNSPLASH_SECRET_KEY
+
+if not access_key:
+    print('Unsplash API key is missing')
+    sys.exit(1)
 
 # Base URL for the Unsplash API
 base_url = 'https://api.unsplash.com'
@@ -31,7 +37,7 @@ def search_images(query, per_page=10, page=1):
     if response.status_code == 200:
         return response.json()['results']
     else:
-        print(f'Failed to fetch images: {response.status_code}')
+        print(f'Failed to fetch images: {response.status_code}, {response.text}')
         return []
 
 # Function to select the best image from the results
@@ -52,13 +58,15 @@ def select_best_image(images, strategy='first'):
 
 # Main function to fetch and store images
 def main():
-    products = Product.objects.filter(image='')  # Fetch products without images
-    if not products:
+    # Fetch products with null image fields
+    products = Product.objects.filter(image__isnull=True)
+    if not products.exists():
         print('No products found without images')
         return
 
     for product in products:
         product_name = product.name
+        print(f'Searching images for product: {product_name}')
         images = search_images(product_name)
         best_image = select_best_image(images, strategy='first')
         if best_image:
