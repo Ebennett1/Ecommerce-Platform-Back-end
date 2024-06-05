@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListCreateAPIView
 from rest_framework import generics, status
 from .models import Category, Product, Cart, CartItem, Order, OrderItem
 from .serializers import UserSerializer, RegisterSerializer, CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer, MyTokenObtainPairSerializer
@@ -51,10 +53,16 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+#Pagination Views
+class ProductPagination(PageNumberPagination):
+    page_size = 10  # Number of products per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 # Product Views
-class ProductList(generics.ListCreateAPIView):
+class ProductList(ListCreateAPIView):
     serializer_class = ProductSerializer
+    pagination_class = ProductPagination
 
     def get_queryset(self):
         queryset = Product.objects.all()
