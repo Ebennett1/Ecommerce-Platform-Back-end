@@ -29,12 +29,17 @@ UNSPLASH_SECRET_KEY = 'W6QdnPQaUc4sWRhhdos4jN6ZOwAHfHeCsROn4xrB0jQ'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['desktop-1foc6dm','localhost' ]
+ALLOWED_HOSTS = ['desktop-1foc6dm','localhost', '127.0.0.1' ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+   'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +52,18 @@ INSTALLED_APPS = [
     'api',
 ]
 
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    
+    'allauth.account.auth_backends.AuthenticationBackend',
+    
+)
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -57,6 +74,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'ecommerce_backend.urls'
@@ -114,9 +133,16 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+     "http://localhost:3000",
+    "http://127.0.0.1:3000"
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
