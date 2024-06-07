@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 import stripe
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
@@ -209,3 +210,23 @@ def create_payment_intent(request):
         return Response({'clientSecret': intent['client_secret']})
     except Exception as e:
         return Response({'error': str(e)}, status=400)
+    
+class PasswordResetView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            # Logic for sending the password reset email
+            send_mail(
+                'Password Reset',
+                'Here is the link to reset your password: <reset link>',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+            return Response({'success': 'Password reset email sent'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User with this email does not exist'}, status=status.HTTP_400_BAD_REQUEST)

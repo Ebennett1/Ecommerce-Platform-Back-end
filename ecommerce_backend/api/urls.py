@@ -1,13 +1,15 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import MyTokenObtainPairView
-from .views import RegisterView, UserProfileUpdateView, CategoryList, ProductList, ProductDetail, CartDetail, AddToCart, UpdateCartItem, OrderCreate, OrderHistoryView, ClearOrderHistoryView, create_payment_intent, reorder
+from django.contrib.auth import views as auth_views
+from .views import RegisterView, UserProfileUpdateView, CategoryList, ProductList, ProductDetail, CartDetail, AddToCart, UpdateCartItem, OrderCreate, OrderHistoryView, ClearOrderHistoryView, create_payment_intent, reorder, PasswordResetView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', UserProfileUpdateView.as_view(), name='profile-update'),
+    path('password/reset/', PasswordResetView.as_view(), name='password-reset'),
     path('categories/', CategoryList.as_view(), name='category-list'),
     path('products/', ProductList.as_view(), name='product-list'),
     path('products/<int:pk>/', ProductDetail.as_view(), name='product-detail'),
