@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-# Custom Token Obtain Pair View
+# Custom Token Obtain Pair View for JWT authentication
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
     permission_classes = (AllowAny,)
@@ -33,7 +33,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
         logger.debug(f"Response data: {response.data}")
         return response
 
-# Home View
+# Simple home view
 def home(request):
     return HttpResponse("Welcome to the home page!")
 
@@ -42,7 +42,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
-# User Detail View
+# User Profile Update View
 class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -50,17 +50,18 @@ class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-# Category Views
+# Category List and Create View
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-#Pagination Views
+
+# Pagination configuration for Product List View
 class ProductPagination(PageNumberPagination):
     page_size = 10  # Number of products per page
     page_size_query_param = 'page_size'
     max_page_size = 100
 
-# Product Views
+# Product List View with search and filter capabilities
 class ProductList(ListCreateAPIView):
     serializer_class = ProductSerializer
     pagination_class = ProductPagination
@@ -78,12 +79,12 @@ class ProductList(ListCreateAPIView):
         
         return queryset
 
-
+# Product Detail View for retrieving, updating, and deleting products
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-# Cart Views
+# Cart Detail View for retrieving and updating the cart
 class CartDetail(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartSerializer
@@ -96,6 +97,7 @@ class CartDetail(generics.RetrieveUpdateAPIView):
             logger.error(f"Failed to fetch cart: {e}")
             raise
 
+# View to add items to the cart
 class AddToCart(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartItemSerializer
@@ -117,6 +119,7 @@ class AddToCart(generics.CreateAPIView):
             logger.error(f'Error adding to cart: {e}')
             return Response({'detail': 'Error adding to cart'}, status=status.HTTP_400_BAD_REQUEST)
 
+# View to update or delete items in the cart
 class UpdateCartItem(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
@@ -142,7 +145,7 @@ class UpdateCartItem(generics.RetrieveUpdateDestroyAPIView):
             logger.error(f"Failed to update cart item: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Order Views
+# View to create an order
 class OrderCreate(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -158,17 +161,16 @@ class OrderCreate(generics.CreateAPIView):
         else:
             logger.error(f"Order creation failed: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
 
+# View to list order history
 class OrderHistoryView(generics.ListAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
-    
 
-
+# View to clear order history
 class ClearOrderHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -177,8 +179,8 @@ class ClearOrderHistoryView(APIView):
         orders = Order.objects.filter(user=user)
         orders.delete()
         return Response({"message": "Order history cleared."}, status=status.HTTP_204_NO_CONTENT)
-    
 
+# View to reorder items from a past order
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def reorder(request, order_id):
@@ -196,8 +198,7 @@ def reorder(request, order_id):
     except Exception as e:
         return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
+# View to create a Stripe payment intent
 @api_view(['POST'])
 def create_payment_intent(request):
     try:
@@ -210,7 +211,8 @@ def create_payment_intent(request):
         return Response({'clientSecret': intent['client_secret']})
     except Exception as e:
         return Response({'error': str(e)}, status=400)
-    
+
+# View to handle password reset
 class PasswordResetView(APIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')

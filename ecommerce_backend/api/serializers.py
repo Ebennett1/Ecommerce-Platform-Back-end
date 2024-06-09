@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Profile, Category, Product, Cart, CartItem, Order, OrderItem
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+# Custom JWT serializer to include additional user data in the token
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -14,11 +15,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return token
     
+# Serializer for the Profile model
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['phone_number']
 
+# Serializer for the User model, including the related Profile
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
 
@@ -38,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
+# Serializer for user registration, creating a user and their profile
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -50,19 +54,22 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password']
         )
-        Profile.objects.create(user=user)
+        Profile.objects.create(user=user)  # Create an associated profile for the new user
         return user
 
+# Serializer for the Category model
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
+# Serializer for the Product model
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
 
+# Serializer for the CartItem model
 class CartItemSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(write_only=True)
     quantity = serializers.IntegerField()
@@ -78,21 +85,26 @@ class CartItemSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+# Serializer for the Cart model
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
+
     class Meta:
         model = Cart
         fields = '__all__'
 
+# Serializer for the OrderItem model
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = '__all__'
 
+# Serializer for the Order model
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     total_price = serializers.DecimalField(required=False, max_digits=10, decimal_places=2)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Order
         fields = '__all__'
@@ -105,7 +117,7 @@ class OrderSerializer(serializers.ModelSerializer):
         total_price = 0
 
         for item in cart_items:
-            order_item = OrderItem.objects.create(
+            OrderItem.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
