@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+
 AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
