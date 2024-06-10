@@ -1,1 +1,1 @@
-web: gunicorn --chdir ecommerce_backend ecommerce_backend.wsgi:application --log-file -
+web: daphne ecommerce_backend.asgi:application
