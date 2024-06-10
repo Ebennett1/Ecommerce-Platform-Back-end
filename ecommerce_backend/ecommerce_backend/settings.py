@@ -95,7 +95,6 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'ecommerce_backend.asgi.application'
 
-
 WSGI_APPLICATION = 'ecommerce_backend.wsgi.application'
 
 
