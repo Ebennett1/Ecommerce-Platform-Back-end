@@ -29,7 +29,7 @@ UNSPLASH_SECRET_KEY = os.environ.get('UNSPLASH_SECRET_KEY', 'W6QdnPQaUc4sWRhhdos
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['your-heroku-app.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['https://elite-cart-8a2140152703.herokuapp.com/', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -130,7 +130,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    'https://elite-cart-8a2140152703.herokuapp.com'
+    'https://elite-cart-8a2140152703.herokuapp.com/'
 
 ]
 
