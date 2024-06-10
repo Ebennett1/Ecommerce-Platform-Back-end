@@ -29,7 +29,7 @@ UNSPLASH_SECRET_KEY = os.environ.get('UNSPLASH_SECRET_KEY', 'W6QdnPQaUc4sWRhhdos
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ['https://elite-cart-8a2140152703.herokuapp.com/', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['elite-cart-8a2140152703.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -53,7 +53,6 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
-
 
 AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -97,8 +96,6 @@ ASGI_APPLICATION = 'ecommerce_backend.asgi.application'
 
 WSGI_APPLICATION = 'ecommerce_backend.wsgi.application'
 
-
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -130,8 +127,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    'https://elite-cart-8a2140152703.herokuapp.com/'
-
+    'https://elite-cart-8a2140152703.herokuapp.com'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -140,8 +136,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     'https://elite-cart-8a2140152703.herokuapp.com'
-    
-    
 ]
 
 # Password validation
