@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'api',
+    'channels',
 ]
 
 SITE_ID = 1
@@ -91,6 +92,9 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'ecommerce_backend.asgi.application'
+
 
 WSGI_APPLICATION = 'ecommerce_backend.wsgi.application'
 
